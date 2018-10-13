@@ -2,35 +2,36 @@ import React from 'react';
 import { Router, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import PropTypes from 'prop-types';
 
-import { history } from '../../helpers';
-import { alertActions } from '../../actions';
-import { PrivateRoute } from '../PrivateRoute';
-import { HomePage } from '../HomePage/HomePage';
-import { AccountPage } from '../AccountPage/AccountPage';
-import { MemoryGame } from '../MemoryGamePage/MemoryGamePage';
-import { LoginPage } from '../LoginPage/LoginPage';
-import { RegisterPage } from '../RegisterPage/RegisterPage';
+import history from '../../helpers/history';
+import alertActions from '../../actions/alert.actions';
+import PrivateRoute from '../PrivateRoute';
+import HomePage from '../HomePage/HomePage';
+import AccountPage from '../AccountPage/AccountPage';
+import MemoryGame from '../MemoryGamePage/MemoryGamePage';
+import LoginPage from '../LoginPage/LoginPage';
+import RegisterPage from '../RegisterPage/RegisterPage';
 
 class App extends React.Component {
     constructor(props) {
         super(props);
 
         const { actions } = this.props;
-        history.listen((location, action) => {
+        history.listen(() => {
             // clear alert on location change
             actions.clear();
         });
     }
-    
+
     render() {
         const { alert } = this.props;
         return (
             <div>
                 <div className="container">
                     <div className="col-sm-8 col-sm-offset-2">
-                        {alert.message &&
-                            <div className={`alert ${alert.type}`}>{alert.message}</div>
+                        {alert.message
+                            && <div className={`alert ${alert.type}`}>{alert.message}</div>
                         }
                         <Router history={history}>
                             <div>
@@ -48,10 +49,15 @@ class App extends React.Component {
     }
 }
 
+App.propTypes = {
+    actions: PropTypes.shape({}).isRequired,
+    alert: PropTypes.shape({}).isRequired,
+};
+
 function mapStateToProps(state) {
     const { alert } = state;
     return {
-        alert
+        alert,
     };
 }
 
@@ -62,4 +68,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 const connectedApp = connect(mapStateToProps, mapDispatchToProps)(App);
-export { connectedApp as App }; 
+export default connectedApp;

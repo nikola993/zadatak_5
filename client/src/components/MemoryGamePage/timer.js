@@ -13,10 +13,6 @@ class Timer extends React.Component {
         this.resetTimer = this.resetTimer.bind(this);
     }
 
-    componentWillUnmount() {
-        this.stopTimer();
-    }
-
     componentDidUpdate(startTimerProp) {
         const { startTimer } = this.props;
         if (startTimer !== startTimerProp.startTimer) {
@@ -26,6 +22,10 @@ class Timer extends React.Component {
         } else if (startTimer === false) {
             this.stopTimer();
         }
+    }
+
+    componentWillUnmount() {
+        this.stopTimer();
     }
 
     startTimer() {

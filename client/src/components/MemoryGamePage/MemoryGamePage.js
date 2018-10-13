@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import PropTypes from 'prop-types';
+
 import * as gameActions from '../../actions/memoryGame.actions';
 import Timer from './timer';
 import './styles.css';
@@ -59,7 +61,6 @@ class MemoryGame extends React.Component {
         // disable selected element
         elementSelected.classList.add('disabled');
         actions.selectField(elementSelected);
-
     }
 
     // get array of elements and shuffle them for board state
@@ -107,10 +108,10 @@ class MemoryGame extends React.Component {
         return (
             <div>
                 <ul className="nav nav-tabs">
-                    <li role="presentation"><Link to="/">Home</Link></li>
-                    <li role="presentation"><Link to="/account">Account</Link></li>
-                    <li role="presentation" className="active"><Link to="/memorygame">Memory Game</Link></li>
-                    <li role="presentation"><Link to="/login">Logout</Link></li>
+                    <li role="presentation"><Link href="/" to="/">Home</Link></li>
+                    <li role="presentation"><Link href="/account" to="/account">Account</Link></li>
+                    <li role="presentation" className="active"><Link href="/memorygame" to="/memorygame">Memory Game</Link></li>
+                    <li role="presentation"><Link href="/login" to="/login">Logout</Link></li>
                 </ul>
                 { this.createBoard() }
             </div>
@@ -118,13 +119,23 @@ class MemoryGame extends React.Component {
     }
 }
 
+MemoryGame.propTypes = {
+    actions: PropTypes.shape({}).isRequired,
+    memoryGame: PropTypes.shape({}),
+};
+
+MemoryGame.defaultProps = {
+    memoryGame: undefined,
+};
+
+
 function mapStateToProps(state) {
     const { users, authentication, memoryGame } = state;
     const { user } = authentication;
     return {
         user,
         users,
-        memoryGame
+        memoryGame,
     };
 }
 
@@ -135,4 +146,4 @@ function mapDispatchToProps(dispatch) {
 }
 
 const connectedMemoryGame = connect(mapStateToProps, mapDispatchToProps)(MemoryGame);
-export { connectedMemoryGame as MemoryGame };
+export default connectedMemoryGame;
