@@ -1,0 +1,27 @@
+{
+  "name": "zadatak_5",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "nodemon": "nodemon ./app.js",
+    "eslint": "npx eslint -- ./server/."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "express-jwt": "^5.3.1",
+    "jsonwebtoken": "^8.3.0",
+    "morgan": "^1.7.0",
+    "mysql2": "^1.6.1",
+    "sequelize": "^4.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.6.1",
+    "nodemon": "^1.11.0"
+  }
+}
