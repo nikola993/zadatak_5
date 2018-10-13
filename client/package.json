@@ -1,9 +1,8 @@
 {
-  "name": "react-redux-registration-login-example",
+  "name": "client_zadatak_5",
   "version": "1.0.0",
   "repository": {
-    "type": "git",
-    "url": "https://github.com/cornflourblue/react-redux-registration-login-example.git"
+    "type": "git"
   },
   "license": "MIT",
   "scripts": {
@@ -18,7 +17,8 @@
     "react-router-dom": "^4.1.2",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.2.0"
+    "redux-thunk": "^2.2.0",
+    "url-parse": "^1.4.3"
   },
   "devDependencies": {
     "babel-core": "^6.21.0",
@@ -28,7 +28,6 @@
     "babel-preset-stage-3": "^6.24.1",
     "css-loader": "^1.0.0",
     "html-webpack-plugin": "^2.26.0",
-    "path": "^0.12.7",
     "style-loader": "^0.23.1",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.8.2"
