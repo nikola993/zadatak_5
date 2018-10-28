@@ -1,66 +1,80 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-import * as gameActions from '../../actions/memoryGame.actions';
+import GameActions from '../../actions/game.actions';
+
+import GameElement from './element';
 import Timer from './timer';
 import './styles.css';
 
-class MemoryGame extends React.Component {
-    constructor(props, context) {
-        super(props, context);
+class MemoryGame extends Component {
+    constructor(props) {
+        super(props);
         this.state = {
             // create new board with shuffled values
             boardElementsValue: this.shuffledElements(),
-            numberOfRightGuesses: 0,
-            startTimer: false,
+            guessedElements: [],
         };
-        this.onFieldClick = this.onFieldClick.bind(this);
+        this.selectedElement = this.selectedElement.bind(this);
     }
 
     componentDidUpdate() {
-        const { actions } = this.props;
-        const { memoryGame } = this.props;
-        const { numberOfRightGuesses } = this.state;
-        // if there are 2 element in state List check if equal
-        if (memoryGame.size === 2) {
-            // get elements from List
-            const firstElement = memoryGame.first();
-            const secondElement = memoryGame.last();
-            if (firstElement.dataset.value === secondElement.dataset.value) {
-                this.state.numberOfRightGuesses += 1;
-                actions.isEqual();
-                if (numberOfRightGuesses === 7) {
-                    this.state.startTimer = false;
+        const { gameState } = this.props;
+        const { gameActions } = this.props;
+        const { guessedElements } = this.state;
+        const elements = gameState.get('selectElements');
+
+        if (elements.size === 2) {
+            const firstElement = elements.get(0);
+            const secondElement = elements.get(1);
+            if (firstElement.value === secondElement.value) {
+                guessedElements.push(firstElement.activeIndex);
+                guessedElements.push(secondElement.activeIndex);
+                gameActions.elementsCompared();
+                if (guessedElements.length === 16) {
+                    gameActions.timerStop();
                 }
             } else {
-                // if elements are not equal get all elements and disable them
-                const list = document.getElementsByClassName('fields');
-                for (let i = 0; i < list.length; i += 1) {
-                    list[i].classList.add('disabledAll');
-                }
-                // after 1 sec make them clickable
+                gameActions.disableElement();
                 setTimeout(() => {
-                    for (let i = 0; i < list.length; i += 1) {
-                        list[i].classList.remove('disabledAll');
-                    }
-                    firstElement.classList.remove('disabled');
-                    secondElement.classList.remove('disabled');
+                    gameActions.elementsCompared();
+                    gameActions.enableElement();
                 }, 1000);
-                actions.notEqual();
             }
         }
     }
 
-    onFieldClick(event) {
-        this.state.startTimer = true;
-        const { actions } = this.props;
-        const elementSelected = event.target;
-        // disable selected element
-        elementSelected.classList.add('disabled');
-        actions.selectField(elementSelected);
+    componentWillUnmount() {
+        const { gameActions } = this.props;
+        gameActions.timerStop();
+        gameActions.elementsCompared();
+    }
+
+    selectedElement(index) {
+        const { gameState } = this.props;
+        const elements = gameState.get('selectElements');
+        if (elements.size === 2) {
+            const firstElement = elements.get(0);
+            const secondElement = elements.get(1);
+            if (firstElement.activeIndex === index || secondElement.activeIndex === index) {
+                return true;
+            }
+        } else if (elements.size === 1) {
+            const firstElement = elements.first();
+            if (firstElement.activeIndex === index) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    handleClick(index, value) {
+        const { gameActions } = this.props;
+        gameActions.timerStart();
+        gameActions.selectField(index, value);
     }
 
     // get array of elements and shuffle them for board state
@@ -84,27 +98,12 @@ class MemoryGame extends React.Component {
         return gameElements;
     }
 
-    // create a board with shuffled elements
-    createBoard() {
-        const { boardElementsValue } = this.state;
-        const { startTimer } = this.state;
-        const gameElements = boardElementsValue;
-        const element = gameElements.map((elemet, index) => (
-            <div className="fields" key={index.toString()} data-value={elemet} role="button" tabIndex={0}>
-                {elemet}
-            </div>));
-        return (
-            <div id="gameBoard" onClick={this.onFieldClick} aria-hidden="true">
-                { element }
-                <div>
-                    <div><strong>Time: </strong></div>
-                    <Timer startTimer={startTimer} />
-                </div>
-            </div>
-        );
-    }
-
     render() {
+        const { boardElementsValue } = this.state;
+        const { guessedElements } = this.state;
+        const { gameState } = this.props;
+        const elementDisable = gameState.get('elementDisable');
+        const timerState = gameState.get('timerState');
         return (
             <div>
                 <ul className="nav nav-tabs">
@@ -113,37 +112,50 @@ class MemoryGame extends React.Component {
                     <li role="presentation" className="active"><Link href="/memorygame" to="/memorygame">Memory Game</Link></li>
                     <li role="presentation"><Link href="/login" to="/login">Logout</Link></li>
                 </ul>
-                { this.createBoard() }
+                <div id="gameBoard">
+                    <div>
+                        { boardElementsValue.map((element, index) => (
+                            <GameElement
+                                key={index.toString()}
+                                index={index}
+                                value={element}
+                                onClick={() => this.handleClick(index, element)}
+                                isActive={this.selectedElement(index)}
+                                elementGuessed={guessedElements}
+                                elementDisable={elementDisable}
+                            />
+                        ))
+                        }
+                    </div>
+                </div>
+                <div className="center">
+                    <div><strong>Time: </strong></div>
+                    <Timer
+                        timerState={timerState}
+                    />
+                </div>
             </div>
         );
     }
 }
 
 MemoryGame.propTypes = {
-    actions: PropTypes.shape({}).isRequired,
-    memoryGame: PropTypes.shape({}),
+    gameState: PropTypes.shape({}).isRequired,
+    gameActions: PropTypes.shape({}).isRequired,
 };
-
-MemoryGame.defaultProps = {
-    memoryGame: undefined,
-};
-
 
 function mapStateToProps(state) {
-    const { users, authentication, memoryGame } = state;
-    const { user } = authentication;
+    const { game: gameState } = state;
     return {
-        user,
-        users,
-        memoryGame,
+        gameState,
     };
 }
 
 function mapDispatchToProps(dispatch) {
     return {
-        actions: bindActionCreators(gameActions, dispatch),
+        gameActions: bindActionCreators(GameActions, dispatch),
     };
 }
 
-const connectedMemoryGame = connect(mapStateToProps, mapDispatchToProps)(MemoryGame);
-export default connectedMemoryGame;
+const game = connect(mapStateToProps, mapDispatchToProps)(MemoryGame);
+export default game;

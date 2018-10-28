@@ -1,0 +1,10 @@
+const gameTypes = {
+    DISABLE_ELEMENT: 'DISABLE_ELEMENT',
+    ENABLE_ELEMENT: 'ENABLE_ELEMENT',
+    SELECT_FIELD: 'SELECT_FIELD',
+    ELEMENTS_COMPARED: 'ELEMENTS_COMPARED',
+    START: 'START',
+    STOP: 'STOP',
+};
+
+export default gameTypes;

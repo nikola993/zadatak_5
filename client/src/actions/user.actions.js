@@ -3,7 +3,6 @@ import userService from '../services/user.service';
 import alertActions from './alert.actions';
 import history from '../helpers/history';
 
-
 function login(username, password) {
     function request(user) { return { type: userConstants.LOGIN_REQUEST, user }; }
     function success(user) { return { type: userConstants.LOGIN_SUCCESS, user }; }
